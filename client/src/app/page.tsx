@@ -1,7 +1,7 @@
 'use client';
 
 import PokeCard from "@/components/PokeCard/PokeCard";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type Pokemon = {
   name: string;
@@ -10,16 +10,37 @@ type Pokemon = {
 
 export default function Home() {
   const [pok, setPok] = useState<{ name: string; url: string }[]>([])
+  const [offset, setOffset] = useState(0)
+  const loaderRef = useRef<HTMLDivElement | null>(null)
 
   const pokemonApi = async () => {
-    const res = await fetch("https://pokeapi.co/api/v2/pokemon")
+    const res = await fetch("https://pokeapi.co/api/v2/pokemon?limit=20&offset=${offset}")
     const pokemon = await res.json()
-    setPok(pokemon.results)
+    setPok(prev => [...prev, ...pokemon.results])
   }
 
   useEffect(()=>{
     pokemonApi()
-  }, [])
+  }, [offset])
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const first = entries[0];
+        if (first.isIntersecting) {
+          setOffset(prev => prev + 20);
+        }
+      },
+      { threshold: 1 }
+    );
+
+    const current = loaderRef.current;
+    if (current) observer.observe(current);
+
+    return () => {
+      if (current) observer.unobserve(current);
+    };
+  }, []);
 
   useEffect(()=>{
     console.log(pok)
@@ -34,6 +55,7 @@ export default function Home() {
         )): null
       }
     </div>
+    <div ref={loaderRef} style={{ height: "40px" }} />
     </>
   );
 }

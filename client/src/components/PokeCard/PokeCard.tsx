@@ -38,13 +38,12 @@ export default function PokeCard({pokeImg, pokeName}: PokeCardProps) {
   }
 
   useEffect(() => {
-    const stored = localStorage.getItem('likedPokemons')
-    console.log(stored)
-    const likedArray = stored ? JSON.parse(stored) : []
+    const stored = localStorage.getItem('likedPokemons');
+    const likedArray = stored ? JSON.parse(stored) : [];
 
-    const isAlreadyLiked = likedArray.some((p: any) => p.pokeName === pokeName)
-    setLike(isAlreadyLiked)
-  },[pokeName]);
+    const isAlreadyLiked = likedArray.some((p: any) => p.pokeName === pokeName);
+    setLike(isAlreadyLiked);
+  }, [pokeName]);
 
 
   return (
