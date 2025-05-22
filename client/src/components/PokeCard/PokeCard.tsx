@@ -29,28 +29,46 @@ export default function PokeCard({pokeImg, pokeName}: PokeCardProps) {
     }
     return false
   })
-
-  const handleLike = () => {
-    setLike(prev => {
-      const newLiked = !prev;
-      localStorage.setItem('likedPokemons', pokeName)
-      return newLiked
-    })
-  }
-
-  useEffect(() => {
-    const stored = localStorage.getItem('likedPokemons');
-    const likedArray = stored ? JSON.parse(stored) : [];
-
-    const isAlreadyLiked = likedArray.some((p: any) => p.pokeName === pokeName);
-    setLike(isAlreadyLiked);
-  }, [pokeName]);
-
   const { ref, inView } = useInView({
     threshold: 0.5,
     triggerOnce: true
   })
 
+  const saveLocal = () =>{
+    const saved = localStorage.getItem('likedPokemons')
+    let favorites: string[] = [];
+
+    if(saved){
+      try {
+        const data = JSON.parse(saved)
+
+        if (Array.isArray(data)) {
+
+          const exists = data.includes(pokeName)
+
+          if(exists){
+            favorites = data.filter(name => name !== pokeName);
+          }else{
+            favorites = [...data, pokeName];
+          }
+        }
+      } catch (error) {
+        console.log(error)
+      }      
+    } else {
+        favorites.push(pokeName);
+    }
+
+        localStorage.setItem('likedPokemons', JSON.stringify(favorites))
+  }
+
+  const handleLike = () => {
+    setLike(like => !like)
+  }
+
+  useEffect(()=>{
+    saveLocal()
+  }, [like])
 
   return (
     <Card sx={{ maxWidth: 345 }} ref={ref}>
@@ -79,3 +97,5 @@ export default function PokeCard({pokeImg, pokeName}: PokeCardProps) {
     </Card>
   );
 }
+
+//Зробити виведення на окремій сторінці улюблених покемонів
