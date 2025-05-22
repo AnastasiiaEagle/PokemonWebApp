@@ -9,6 +9,7 @@ import CardActions from '@mui/material/CardActions';
 import IconButton, { IconButtonProps } from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import { useInView } from "react-intersection-observer";
 
 
 interface ExpandMoreProps extends IconButtonProps {
@@ -45,13 +46,18 @@ export default function PokeCard({pokeImg, pokeName}: PokeCardProps) {
     setLike(isAlreadyLiked);
   }, [pokeName]);
 
+  const { ref, inView } = useInView({
+    threshold: 0.5,
+    triggerOnce: true
+  })
+
 
   return (
-    <Card sx={{ maxWidth: 345 }}>
+    <Card sx={{ maxWidth: 345 }} ref={ref}>
       <CardMedia
         component="img"
         height="125"
-        image={pokeImg}
+        image={inView ? pokeImg : "images/kotik.jpg"}
         alt={pokeName}
         style={{ 
           objectFit: 'cover', 
